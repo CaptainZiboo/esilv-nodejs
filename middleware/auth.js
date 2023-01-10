@@ -1,0 +1,63 @@
+const User = require("../models/user")
+const { verifyAccessToken, verifyRefreshToken } = require("../services/token")
+
+const checkAuth = (req, res, next) => {
+
+    try {
+
+        const auth = req.headers.authorization
+
+        // Si le token n'est pas présent dans les headers, on vérifie l'existence d'un refreshToken
+
+        if( !auth ) return checkRefresh(req, res, next);
+
+        // Sinon, on vérifie que le token présent dans les headers est valide
+
+        const [type, token] = auth.split(' ')
+
+        if( type !== 'Bearer' ) return res.status(401).json({ error: 'Attendu : Bearer token' })
+
+        const data = verifyAccessToken(token)
+        req.user = data.user
+        next();
+
+    } catch (error) {
+
+        checkRefresh(req, res, next);
+
+    }
+
+}
+
+const checkRefresh = async (req, res, next) => {
+
+    const refreshToken = req.cookies.refreshToken
+
+    if( !refreshToken ) return res.status(401).json({ error: 'Vous devez être connecté' })
+
+    try {
+
+        const { _id } = verifyRefreshToken(refreshToken)
+        
+        const user = await User.findByPk(_id)
+
+        if( !user ) return res.status(401).json({ error: 'Vous n\'êtes pas autorisés à vous connecter !' })
+
+        req.user = user
+
+        return next();
+
+    } catch (error) {
+
+        throw new Error('Erreur lors de la vérification du token', error)
+
+    }
+
+}
+
+const roles = {
+
+    admin: 'admin',
+    user: 'user'
+
+}
