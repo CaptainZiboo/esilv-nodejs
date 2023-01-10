@@ -138,3 +138,77 @@ route.get('', async (req, res) => {
     }
 
 })
+
+// Ajout et suppression de likes
+
+route.post('/like', [checkAuth], async (req, res) => {
+
+    const { _id } = req.body
+
+    try {
+
+        const post = await Post.findByPk(_id)
+
+        if( !post ) {
+            
+            throw new Error('Publication introuvable')
+
+        }
+
+        const user = await User.findByPk(req.user._id)
+
+        if( !user ) {
+            
+            throw new Error('Utilisateur introuvable')
+
+        }
+
+        const like = await post.addLikedBy(user)
+
+        res.status(200).json({ message: 'Like ajouté !' })
+
+    } catch (error) {
+
+        res.status(400).json({ error: error.message })
+
+    }
+
+})
+
+route.post('/unlike', [checkAuth], async (req, res) => {
+
+    const { _id } = req.body
+
+    try {
+
+        const post = await Post.findByPk(_id)
+
+        if( !post ) {
+            
+            throw new Error('Publication introuvable')
+
+        }
+
+        const user = await User.findByPk(req.user._id)
+
+        if( !user ) {
+            
+            throw new Error('Utilisateur introuvable')
+
+        }
+
+        const like = await post.removeLikedBy(user)
+
+        res.status(200).json({ message: 'Like supprimé !' })
+
+    } catch (error) {
+
+        res.status(400).json({ error: error.message })
+
+    }
+
+})
+
+route.use('/comments', require('./comments'))
+
+module.exports = route
