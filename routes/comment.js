@@ -28,7 +28,7 @@ route.post('/create', [checkAuth], async (req, res) => {
 
 }) 
 
-route.post('/update', [checkAuth, checkAdmin], async (req, res) => {
+route.put('/update', [checkAuth, checkAdmin], async (req, res) => {
 
     const { _id, content } = req.body
 
@@ -61,7 +61,7 @@ route.post('/update', [checkAuth, checkAdmin], async (req, res) => {
     }
 
 })
-route.post('/delete', [checkAuth, checkAdmin], async (req, res) => {
+route.delete('/delete', [checkAuth, checkAdmin], async (req, res) => {
 
     const { _id } = req.body
 

@@ -29,7 +29,7 @@ route.post('/create', [checkAuth, checkRole('admin')], async (req, res) => {
 
 })
 
-route.post('/update', [checkAuth, checkRole('admin')], async (req, res) => {
+route.put('/update', [checkAuth, checkRole('admin')], async (req, res) => {
 
     const { _id, name, description } = req.body
 
@@ -57,7 +57,7 @@ route.post('/update', [checkAuth, checkRole('admin')], async (req, res) => {
 
 })
 
-route.post('/delete', [checkAuth, checkRole('admin')], async (req, res) => {
+route.delete('/delete', [checkAuth, checkRole('admin')], async (req, res) => {
 
     const { _id } = req.body
 
