@@ -64,12 +64,4 @@ User.beforeCreate( async (user) => {
 
 });
 
-User.sync({ force: true }).then( async () => {
-
-    // Création d'un utilisateur admin par défaut
-
-    // await User.create({ _id:v4() , username: 'admin', email: 'admin@localhost', password: 'admin', role: 'admin' })
-
-})
-
 module.exports = User
