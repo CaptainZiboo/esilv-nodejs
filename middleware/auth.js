@@ -61,3 +61,76 @@ const roles = {
     user: 'user'
 
 }
+
+const checkRole = (role, options = {}) => {
+
+    return function (req, res, next) {
+
+        const user = req.user
+
+        const hierarchy = Object.keys(roles)
+
+        if( req.body && options.securedFields ) {
+
+            const securedFieldsFound = Object.keys(req.body).filter(field => options.securedFields.includes(field))
+
+            if( securedFieldsFound.length ) {
+
+                if( !user ) {
+
+                    return res.status(401).json({ error: 'Vous devez être connecté' })
+
+                }
+
+                if( roles.hierarchy.indexOf(user.role) < hierarchy.indexOf(role) ) {
+
+                    return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à modifier ces champs' })
+
+                }
+
+                return next();
+
+            }
+
+        }
+
+        if( options.anonymous ) return next();
+
+        if( hierarchy.indexOf(user.role) < hierarchy.indexOf(role) ) {
+
+            return res.status(403).json({ error: 'Vous n\'êtes pas autorisé à modifier ces champs' })
+
+        }
+
+        return next();
+
+    }
+
+}
+
+const checkAdmin = (req, res, next) => {
+
+    const user = req.user
+
+    const hierarchy = Object.keys(roles)
+
+    if( hierarchy.indexOf(user.role) < hierarchy.indexOf('admin') ) {
+
+        req.user.isAdmin = false;
+
+    } else {
+
+        req.user.isAdmin = true;
+
+    }
+
+    next();
+
+}
+
+
+module.exports = {
+
+    checkAuth, checkRefresh, checkRole, checkAdmin
+
+}
